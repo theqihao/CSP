@@ -31,6 +31,8 @@ vector<USER> U;
 
 void find1(string user, string quan) {
     int flag = 0;
+    int flag2 = 0;
+    int num = 0;
     for (int i = 0; i < U.size(); i++) {
         if (U[i].name == user) {
            // cout << U[i].name << endl;
@@ -38,8 +40,59 @@ void find1(string user, string quan) {
              //   cout << U[i].JIAOS[j].name << endl;
                 for (int k = 0; k < U[i].JIAOS[j].num; k++) {
                     if (U[i].JIAOS[j].QUANS[k].name == quan) {
-                        flag = 1;
-                        break;
+                        if (U[i].JIAOS[j].QUANS[k].type ==  1) {
+                            flag2 = 1;
+                            num = max(num, U[i].JIAOS[j].QUANS[k].num);
+                            //printf("%d\n", U[i].JIAOS[j].QUANS[k].num);
+                            //break;
+                        } else {
+                            flag = 1;
+                            break;
+                        }
+
+                    }
+                }
+                if (flag) break;
+            }
+            if (flag) break;
+        }
+    }
+    if (flag2 == 0) {
+        if (flag) printf("true\n");
+        else printf("false\n");
+    } else {
+        printf("%d\n", num);
+    }
+}
+
+
+void find2(string user, string quan) {
+
+    for (int i = 0; i < quan.size(); i++) {
+        if (quan[i] == ':') {
+            quan[i] = ' ';
+            break;
+        }
+    }
+
+    stringstream ss(quan);
+    string real;
+    int num;
+    ss >> real;
+    ss >> num;
+
+    int flag = 0;
+    for (int i = 0; i < U.size(); i++) {
+        if (U[i].name == user) {
+           // cout << U[i].name << endl;
+            for (int j = 0; j < U[i].num; j++) {
+             //   cout << U[i].JIAOS[j].name << endl;
+                for (int k = 0; k < U[i].JIAOS[j].num; k++) {
+                    if (U[i].JIAOS[j].QUANS[k].name == real) {
+                        if (U[i].JIAOS[j].QUANS[k].num >= num) {
+                            flag = 1;
+                            break;
+                        }
                     }
                 }
                 if (flag) break;
@@ -55,7 +108,7 @@ void find1(string user, string quan) {
 
 
 int main() {
-  //  freopen("in.txt", "r", stdin);
+    //freopen("in.txt", "r", stdin);
 
     // input1
     int n;
@@ -131,6 +184,8 @@ int main() {
         // 1
         if (quan_str.find(":") == -1) {
             find1(user_str, quan_str);
+        } else if (quan_str.find(":") != -1) {
+            find2(user_str, quan_str);
         }
         // 2
 
