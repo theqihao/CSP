@@ -1,104 +1,132 @@
-#include <iostream>
 #include <stdio.h>
+#include <iostream>
+#include <stdlib.h>
 #include <string.h>
-#include <vector>
-#include <algorithm>
-#include <string>
+#include <queue>
+#define INF 0x3fffffff
+#define N 3500
 
-#define row 0
-#define ver 1
+#define max(a, b) a > b ? a : b
+#define min(a, b) a < b ? a : b
 
+typedef long long LL;
 using namespace std;
 
-char g[105][105];
-char fan[2];
+char a[120][120];
+int n, m, q;
 
-bool vis[105][105];
+bool check(int x, int y) {
+    if (0 <= x && x < n && 0 <= y && y < m) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
-int dx[] = {0, 1, 0, -1};
-int dy[] = {1, 0, -1, 0};
+bool is_ok(int x, int y) {
+    if (a[x][y] != '|' && a[x][y] != '-' && a[x][y] != '+') {
+        return true;
+    } else {
+        return false;
+    }
+}
 
-int n, m;
-int p;
+int dx[4] = {0, 0, -1, 1};
+int dy[4] = {1, -1, 0, 0};
 
-// 0 1 0 2 0
-void line(int x1, int y1, int x2, int y2) {
-    int op;
-    if (x1 == x2) op = 1;
-    else op = 0;
-
-    char c = op == 1 ? '|' : '-';
-    if (op) {
-        for (int y = min(y1, y2); y <= max(y1, y2); y++) {
-                if (g[y][x1] == '+') continue;
-            if (fan[op] == g[y][x1]) {
-                g[y][x1] = '+';
+void draw_line() {
+    int x1, y1, x2, y2;
+    scanf("%d%d%d%d", &y1, &x1, &y2, &x2);
+    x1 = n-1-x1;
+    x2 = n-1-x2;
+    if (x1 == x2) {
+        char c = '-';
+        if (y2 < y1) {
+            int temp = y1;
+            y1 = y2;
+            y2 = temp;
+        }
+        for (int i = y1; i <= y2; i++) {
+            if (a[x1][i] == '|' || a[x1][i] == '+') {
+                a[x1][i] = '+';
             } else {
-                g[y][x1] = c;
+                a[x1][i] = c;
             }
         }
     } else {
-        y1 = m - 1 - y1;
-        for (int x = min(x1,x2); x <= max(x1, x2); x++) {
-            if (g[y1][x] == '+') continue;
-            if (fan[op] == g[y1][x]) {
-                g[y1][x] = '+';
+        char c = '|';
+        if (x2 < x1) {
+            int temp = x1;
+            x1 = x2;
+            x2 = temp;
+        }
+        for (int i = x1; i <= x2; i++) {
+            if (a[i][y1] == '-' || a[i][y1] == '+') {
+                a[i][y1] = '+';
             } else {
-                g[y1][x] = c;
+                a[i][y1] = c;
             }
         }
     }
 }
 
-int flag = 0;
+int xs[10001];
+int ys[10001];
 
-void next(int x, int y, char c) {
-    if (g[x][y] == '-' || g[x][y] == '|' || g[x][y] == '+' || vis[x][y] == 1) {
-        return ;
-    }
-    vis[x][y] = 1;
-    g[x][y] = c;
-    for (int i = 0; i < 4; i++) {
-        int nx = x + dx[i];
-        int ny = y + dy[i];
-        if (0 <= nx && nx < m && 0 <= ny && ny < n)
-            next(nx, ny, c);
+void fill_a() {
+    int x, y;
+    char c;
+    scanf("%d%d %c", &y, &x, &c);
+    x = n-1-x;
+    //printf("%c\n", c);
+    getchar();
+    int index = 0;
+    a[x][y] = c;
+    xs[index] = x;
+    ys[index] = y;
+    index++;
+    while (index) {
+        int cx = xs[index-1];
+        int cy = ys[index-1];
+        index--;
+        for (int i = 0; i < 4; i++) {
+            int nx = cx + dx[i];
+            int ny = cy + dy[i];
+            if (check(nx, ny) && is_ok(nx, ny) && a[nx][ny] != c) {
+                a[nx][ny] = c;
+                xs[index] = nx;
+                ys[index] = ny;
+                index++;
+            }
+        }
     }
 }
 
-
 int main() {
-  //  freopen("in.txt", "r", stdin);
-    fan[0] = '|';
-    fan[1] = '-';
-    scanf("%d%d%d", &n, &m, &p);
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            g[i][j] = '.';
+    //freopen("in.txt", "r", stdin);
+
+    scanf("%d%d%d", &m, &n, &q);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            a[i][j] = '.';
         }
     }
 
     int op;
-    for (int i = 0; i < p; i++) {
+    for (int i = 0; i < q; i++) {
         scanf("%d", &op);
         if (op == 0) {
-            int x1, y1, x2, y2;
-            scanf("%d%d%d%d", &x1, &y1, &x2, &y2);
-            line(x1, y1, x2, y2);
-        } else if (op == 1) {
-            int x1, y1;
-            char c;
-            scanf("%d%d", &x1, &y1);
-            cin >> c;
-            memset(vis, 0 , sizeof(vis));
-            next(m - 1 - y1, x1, c);
+            draw_line();
+        } else {
+            fill_a();
         }
     }
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            cout << g[i][j];
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            printf("%c", a[i][j]);
         }
-        cout << endl;
+        printf("\n");
     }
     return 0;
 }
